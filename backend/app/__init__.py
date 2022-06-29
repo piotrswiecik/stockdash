@@ -54,7 +54,7 @@ def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
 
     # database-related init
     db.init_app(app)
-    migrate.init_app(app)
+    migrate.init_app(app, db)
 
     @app.shell_context_processor
     def make_shell_context():
@@ -64,6 +64,7 @@ def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
         }
 
     app.logger.warning(f'Application started with env: {os.environ.get("FLASK_ENV")}')
+    print(app.config)
 
     return app
 
