@@ -13,6 +13,9 @@
     </div>
     <button type="button" name="login-submit" @click="login">Login</button>
   </form>
+  <div class="login-error" v-if="loginError">
+    <p>Login error</p>
+  </div>
 </template>
 
 <script>
@@ -24,7 +27,15 @@ export default {
       enteredPassword: '',
       enteredUsernameValid: true,
       enteredPasswordValid: true,
+      loginError: null,
     };
+  },
+  beforeMount() {
+    this.enteredUsername = '';
+    this.enteredPassword = '';
+    this.enteredUsernameValid = true;
+    this.enteredPasswordValid = true;
+    this.loginError = null;
   },
   methods: {
     validateField(event) {
@@ -50,6 +61,7 @@ export default {
         await this.$router.replace({name: 'dashboard'});
       } catch(err) {
         console.log('authentication handler returned error: ' + err);
+        this.loginError = err.message === 'Authentication failed!' ? err.message : 'Authentication failed!';
       }
     },
   },
@@ -58,6 +70,10 @@ export default {
 
 <style scoped>
 .validation-error {
+  color: red;
+}
+
+.login-error {
   color: red;
 }
 </style>
