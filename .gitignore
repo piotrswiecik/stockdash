@@ -2,3 +2,5 @@ devlog.md
 .idea/
 **/__pycache__
 **/node_modules
+backend/utility.sh
+**/instance
