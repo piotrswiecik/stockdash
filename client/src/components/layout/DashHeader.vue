@@ -4,14 +4,19 @@
       <h2>StockDash</h2>
     </div>
     <div class="item-right">
-      <p>test</p>
+      <p><a href="#" @click="logout">Logout</a></p>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: "DashHeader"
+  name: "DashHeader",
+  methods: {
+    logout() {
+      this.$store.dispatch('auth/logoutRequest');
+    },
+  }
 }
 </script>
 

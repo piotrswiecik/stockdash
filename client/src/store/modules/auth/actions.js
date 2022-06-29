@@ -34,4 +34,7 @@ export default {
         });
         return null; // a placeholder - response is not used at the moment
     },
+    logoutRequest(context) {
+        context.commit('setNotAuthenticatedStatus');
+    }
 };
