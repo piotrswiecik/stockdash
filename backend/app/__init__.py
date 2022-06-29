@@ -7,6 +7,7 @@ from logging.handlers import RotatingFileHandler
 from flask.logging import default_handler
 from flask import Flask
 from typing import Optional, Any, Mapping
+from app.db import db
 
 
 def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
@@ -49,6 +50,16 @@ def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
             log_handler.setLevel(logging.CRITICAL)  # only minimum logging when environment is undefined
     app.logger.addHandler(log_handler)
     app.logger.removeHandler(default_handler)
+
+    # database-related init
+    db.init_app(app)
+
+    @app.shell_context_processor
+    def make_shell_context():
+        print('test')
+        return {
+            'db': db,
+        }
 
     app.logger.warning(f'Application started with env: {os.environ.get("FLASK_ENV")}')
 
