@@ -8,6 +8,7 @@ from flask.logging import default_handler
 from flask import Flask
 from typing import Optional, Any, Mapping
 from app.db import db, migrate
+from app.db.usermodel import User
 
 
 def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
@@ -57,9 +58,9 @@ def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
 
     @app.shell_context_processor
     def make_shell_context():
-        print('test')
         return {
             'db': db,
+            'User': User
         }
 
     app.logger.warning(f'Application started with env: {os.environ.get("FLASK_ENV")}')
