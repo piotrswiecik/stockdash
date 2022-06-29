@@ -26,7 +26,7 @@ class DevelopmentConfig(Config):
     LOGLEVEL = 'debug'
 
 
-class TestConfig(Config):
+class TestingConfig(Config):
     DEBUG = False
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL',
