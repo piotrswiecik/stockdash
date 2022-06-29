@@ -53,7 +53,7 @@ class User(db.Model):
         """
         return cls.query.filter_by(email=email).first()
 
-    def password_corrent(self, password: str) -> bool:
+    def password_correct(self, password: str) -> bool:
         """
         Check plaintext password against hashed password in database.
         :param password: Password string.

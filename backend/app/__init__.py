@@ -6,9 +6,11 @@ import logging
 from logging.handlers import RotatingFileHandler
 from flask.logging import default_handler
 from flask import Flask
+from flask_jwt_extended import JWTManager
 from typing import Optional, Any, Mapping
 from app.db import db, migrate
 from app.db.usermodel import User
+from app.restapi import restapi as restapi_blueprint
 
 
 def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
@@ -56,6 +58,14 @@ def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
 
+    # security init
+    jwt = JWTManager(app)
+
+    # register blueprints & RESTful
+    app.register_blueprint(restapi_blueprint)
+
+
+    # configure shell context
     @app.shell_context_processor
     def make_shell_context():
         return {
@@ -64,7 +74,6 @@ def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
         }
 
     app.logger.warning(f'Application started with env: {os.environ.get("FLASK_ENV")}')
-    print(app.config)
 
     return app
 
