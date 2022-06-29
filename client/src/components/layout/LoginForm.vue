@@ -14,7 +14,7 @@
     <button type="button" name="login-submit" @click="login">Login</button>
   </form>
   <div class="login-error" v-if="loginError">
-    <p>Login error</p>
+    <p>{{ this.loginError }}</p>
   </div>
 </template>
 
@@ -53,14 +53,13 @@ export default {
         return;
       }
       try {
+        // eslint-disable-next-line no-unused-vars
         const loginResponse = await this.$store.dispatch('auth/loginRequest', {
           username: this.enteredUsername,
           password: this.enteredPassword,
         });
-        console.log('auth request ok, returned: ' + loginResponse);
         await this.$router.replace({name: 'dashboard'});
       } catch(err) {
-        console.log('authentication handler returned error: ' + err);
         this.loginError = err.message === 'Authentication failed!' ? err.message : 'Authentication failed!';
       }
     },

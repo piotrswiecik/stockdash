@@ -11,6 +11,7 @@ flask-jwt-extended = "*"
 psycopg2-binary = "*"
 pytest = "*"
 flask-migrate = "*"
+flask-cors = "*"
 
 [dev-packages]
 

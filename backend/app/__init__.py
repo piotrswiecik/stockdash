@@ -7,6 +7,7 @@ from logging.handlers import RotatingFileHandler
 from flask.logging import default_handler
 from flask import Flask
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 from typing import Optional, Any, Mapping
 from app.db import db, migrate
 from app.db.usermodel import User
@@ -63,6 +64,10 @@ def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
 
     # register blueprints & RESTful
     app.register_blueprint(restapi_blueprint)
+
+    # cross-origin
+    # todo remember about production settings - this is temporary & unlocks all routes
+    CORS(app)
 
     # configure shell context
     @app.shell_context_processor
