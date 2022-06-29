@@ -64,7 +64,6 @@ def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
     # register blueprints & RESTful
     app.register_blueprint(restapi_blueprint)
 
-
     # configure shell context
     @app.shell_context_processor
     def make_shell_context():
@@ -73,7 +72,7 @@ def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
             'User': User
         }
 
-    app.logger.warning(f'Application started with env: {os.environ.get("FLASK_ENV")}')
+    app.logger.info(f'Application started with env: {os.environ.get("FLASK_ENV")}')
 
     return app
 

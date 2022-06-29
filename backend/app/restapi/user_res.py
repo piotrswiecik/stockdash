@@ -33,7 +33,6 @@ class UserLogin(Resource):
         args = cls.parser.parse_args(strict=True)
         user = User.get_by_username(args['username'])
         if user and user.password_correct(args['password']):
-            print('breakpoint: ok')
             access_token = create_access_token(identity=user.id, fresh=True)
             refresh_token = create_refresh_token(user.id)
             return {  # fails at this point in pytest
