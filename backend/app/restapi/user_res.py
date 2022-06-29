@@ -1,6 +1,7 @@
 """
 User Resources for REST API.
 """
+from flask import current_app
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import create_access_token, create_refresh_token
 from app.restapi import api  # Api class instance
@@ -31,14 +32,15 @@ class UserLogin(Resource):
         """
         args = cls.parser.parse_args(strict=True)
         user = User.get_by_username(args['username'])
-
         if user and user.password_correct(args['password']):
+            print('breakpoint: ok')
             access_token = create_access_token(identity=user.id, fresh=True)
             refresh_token = create_refresh_token(user.id)
-            return {
+            return {  # fails at this point in pytest
                 'access_token': access_token,
                 'refresh_token': refresh_token
             }, 200
 
+        current_app.logger.warning(f'Login failed for user {args["username"]}')
         return {'message': 'Authorization failed'}, 401
 
