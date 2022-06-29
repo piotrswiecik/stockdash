@@ -32,11 +32,15 @@ export default {
       // this.$router.push({name: 'dashboard'});
       console.log('received login data: ' + this.enteredUsername + ' ' + this.enteredPassword);
       console.log('forwarding to vuex');
-      const loginResponse = await this.$store.dispatch('auth/loginRequest', {
-        username: this.enteredUsername,
-        password: this.enteredPassword,
-      });
-      console.log('auth request returned: ' + loginResponse);
+      try {
+        const loginResponse = await this.$store.dispatch('auth/loginRequest', {
+          username: this.enteredUsername,
+          password: this.enteredPassword,
+        });
+        console.log('auth request ok, returned: ' + loginResponse);
+      } catch(err) {
+        console.log('authentication handler returned error: ' + err);
+      }
     },
   },
 }
