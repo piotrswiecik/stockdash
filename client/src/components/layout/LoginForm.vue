@@ -11,7 +11,7 @@
       <input type="password" id="password" name="password" v-model.trim="enteredPassword" @blur="validateField">
       <p class="validation-error" v-if="!enteredPasswordValid">Password must contain at least 8 characters</p>
     </div>
-    <button name="login-submit" @click="login">Login</button>
+    <button type="button" name="login-submit" @click="login">Login</button>
   </form>
 </template>
 
@@ -38,8 +38,6 @@ export default {
     },
     async login() {
       // attempt login with credentials provided in login form
-      // console.log('validating');
-      // await this.validateField(event);
       if (!this.enteredUsernameValid || !this.enteredPasswordValid) {
         return;
       }
@@ -49,6 +47,7 @@ export default {
           password: this.enteredPassword,
         });
         console.log('auth request ok, returned: ' + loginResponse);
+        await this.$router.replace({name: 'dashboard'});
       } catch(err) {
         console.log('authentication handler returned error: ' + err);
       }
