@@ -7,7 +7,7 @@ from logging.handlers import RotatingFileHandler
 from flask.logging import default_handler
 from flask import Flask
 from typing import Optional, Any, Mapping
-from app.db import db
+from app.db import db, migrate
 
 
 def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
@@ -53,6 +53,7 @@ def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
 
     # database-related init
     db.init_app(app)
+    migrate.init_app(app)
 
     @app.shell_context_processor
     def make_shell_context():

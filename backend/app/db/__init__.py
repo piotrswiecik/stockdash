@@ -3,6 +3,7 @@ This package contains database models & database-related setup.
 """
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
+from flask_migrate import Migrate
 
 convention = {  # key naming conventions to be used in SQLAlchemy metadata
     "ix": 'ix_%(column_0_label)s',
@@ -13,5 +14,5 @@ convention = {  # key naming conventions to be used in SQLAlchemy metadata
 }
 
 metadata = MetaData(naming_convention=convention)
-
 db = SQLAlchemy(metadata=metadata)
+migrate = Migrate(db)
