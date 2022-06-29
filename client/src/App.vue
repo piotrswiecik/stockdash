@@ -1,16 +1,11 @@
 <template>
-  <p>Test vuex: {{ test }}</p>
+  <router-view></router-view>
 </template>
 
 <script>
 
 export default {
   name: 'App',
-  computed: {
-    test() {
-      return this.$store.state.test;
-    }
-  }
 }
 </script>
 
