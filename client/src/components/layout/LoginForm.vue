@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent>
+  <form @submit.prevent @keydown.enter="login">
     <h3>Login form</h3>
     <div class="form-control">
       <label for="username">Username</label>
@@ -41,13 +41,15 @@ export default {
     validateField(event) {
       // check if data was entered && if password is 8+ chars
       if (event.target.name === 'username') {
+        console.log(event);
         this.enteredUsernameValid = this.enteredUsername !== '';
       }
       else if (event.target.name === 'password') {
         this.enteredPasswordValid = this.enteredPassword !== '' && this.enteredPassword.length >= 8;
       }
     },
-    async login() {
+    async login(event) {
+        this.validateField(event);
       // attempt login with credentials provided in login form
       if (!this.enteredUsernameValid || !this.enteredPasswordValid) {
         return;
