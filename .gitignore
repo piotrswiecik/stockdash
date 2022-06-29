@@ -4,3 +4,4 @@ devlog.md
 **/node_modules
 backend/utility.sh
 **/instance
+**/.pytest_cache
