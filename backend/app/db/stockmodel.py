@@ -103,7 +103,6 @@ class Stock(db.Model):
                                    "if you would like to target a higher API call frequency. "
 
                 query_response = request.urlopen(query_string)
-                # query_response_unpacked = json.loads(query_response.read().decode('utf-8'))
                 query_response_unpacked = query_response.json()
 
                 if 'Note' in query_response_unpacked and overload_message in query_response_unpacked['Note']:
@@ -122,8 +121,10 @@ class Stock(db.Model):
             except ValueError as e:
                 if e.args[0] == 'API response empty':
                     current_app.logger.error(f'AV API provided empty response for {self.ticker}')
+                    raise e  # bubble up
                 if e.args[0] == 'API call limit exceeded':
                     current_app.logger.info(f'AV API call limit exceeded')
+                    raise e  # bubble up
 
             except SQLAlchemyError as e:
                 current_app.logger.error(f'SQLAlchemyError for {self.ticker} while saving data from API response')
@@ -149,7 +150,6 @@ class Stock(db.Model):
                                    "if you would like to target a higher API call frequency. "
 
                 query_response = request.urlopen(query_string)
-                # query_response_unpacked = json.loads(query_response.read().decode('utf-8'))
                 query_response_unpacked = query_response.json()
 
                 if 'Note' in query_response_unpacked and overload_message in query_response_unpacked['Note']:
