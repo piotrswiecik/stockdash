@@ -2,10 +2,14 @@
 Tests for AlphaVantage interface.
 Mainly proper handling of various responses and errors.
 """
+import datetime
+
 import pytest
 
 from app.db.stockmodel import Stock
 from urllib import request
+
+from tests.mock_responses import overview_response, timeseries_response
 
 
 class MockSuccessTimeSeriesResponse(object):
@@ -23,31 +27,25 @@ class MockSuccessTimeSeriesResponse(object):
         Generate mock response content as specified in TIME_SERIES_DAILY API.
         :return: Dictionary containing deserialized response data.
         """
-        return {
-            "Meta Data": {
-                "1. Information": "Daily Prices (open, high, low, close) and Volumes",
-                "2. Symbol": "IBM",
-                "3. Last Refreshed": "2022-06-30",
-                "4. Output Size": "Compact",
-                "5. Time Zone": "US/Eastern"
-            },
-            "Time Series (Daily)": {
-                "2022-06-30": {
-                    "1. open": "139.5800",
-                    "2. high": "142.4600",
-                    "3. low": "139.2800",
-                    "4. close": "141.1900",
-                    "5. volume": "4878020"
-                },
-                "2022-06-29": {
-                    "1. open": "142.7400",
-                    "2. high": "143.5213",
-                    "3. low": "139.5000",
-                    "4. close": "140.7100",
-                    "5. volume": "4161491"
-                },
-            },
-        }
+        return timeseries_response
+
+
+class MockSuccessOverviewResponse(object):
+    """
+    Represents a successful HTTP response to AlphaVantage OVERVIEW request.
+    """
+    def __init__(self, url: str) -> None:
+        self.status_code = 200
+        self.url = url
+        self.headers = {'Content-Type': 'application/json'}
+
+    @classmethod
+    def json(cls) -> dict:
+        """
+        Generate mock response content as specified in OVERVIEW API.
+        :return: Dictionary containing deserialized response data.
+        """
+        return overview_response
 
 
 class MockLimitExceededResponse(object):
@@ -117,7 +115,7 @@ class MockErrorResponseObject(object):
 
 def test_monkeypatch_get_time_series_daily_success(monkeypatch, app, client):
     """
-    Given a monkeypatched version of urllib.request.urlopen()
+    Given a monkeypatched version of urllib.request.urlopen() and Stock.get_timeseries_data() method.
     When HTTP response is received as OK (200).
     Then response content conforms with ORM definition && is properly saved in DB.
     """
@@ -126,10 +124,11 @@ def test_monkeypatch_get_time_series_daily_success(monkeypatch, app, client):
 
     monkeypatch.setattr(request, 'urlopen', mock_http_urlopen)
 
-    stock = Stock('IBM')
-    stock.get_timeseries_data()  # written to test database
+    with app.app_context():
+        stock = Stock('IBM')
+        stock.get_timeseries_data()  # written to test database
 
-    db_response = Stock.query.filter_by(ticker='IBM').first()
+        db_response = Stock.query.filter_by(ticker='IBM').first()
 
     assert db_response
     assert db_response.ticker == 'IBM'
@@ -195,4 +194,38 @@ def test_monkeypatch_get_time_series_daily_api_incorrect_key(monkeypatch, app):
 def test_monkeypatch_get_time_series_daily_api_httperror(monkeypatch, app):
     pass
 
+
+def test_monkeypatch_get_overview_success(monkeypatch, app):
+    """
+    Given a monkeypatched version of urllib.request.urlopen() and Stock.get_overview_data() method.
+    When HTTP response is received as OK (200).
+    Then response content conforms with ORM definition && is properly saved in DB.
+    """
+    def mock_http_urlopen(url: str) -> MockSuccessOverviewResponse:
+        return MockSuccessOverviewResponse(url)
+
+    monkeypatch.setattr(request, 'urlopen', mock_http_urlopen)
+
+    with app.app_context():
+        stock = Stock('IBM')
+        stock.get_overview_data()  # written to test database
+
+        db_response = Stock.query.filter_by(ticker='IBM').first()
+
+    assert db_response
+    assert db_response.ticker == 'IBM'
+    assert db_response.name == 'International Business Machines'
+    assert 'The company began in 1911' in db_response.description
+    assert db_response.exchange == 'NYSE'
+    assert db_response.sector == 'Technology'
+    assert db_response.industry == 'Computer & Office Equipment'
+    assert db_response.market_cap == 126551425000
+    assert db_response.no_shares == 896320000
+    assert db_response.trail_pe_ratio == 23.19
+    assert db_response.fwd_pe_ratio == 14.45
+    assert db_response.d_yield == 0.0469
+    assert db_response.high_52w == 144.73
+    assert db_response.low_52w == 111.84
+    assert db_response.eps == {'eps': 'eps'}
+    assert datetime.datetime.now() - db_response.last_cache_time < datetime.timedelta(seconds=5)
 
