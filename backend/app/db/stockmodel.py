@@ -120,6 +120,7 @@ class Stock(db.Model):
 
             except error.HTTPError as e:
                 current_app.logger.error(f'AV API returned HTTP error {e.code} while querying for {self.ticker}')
+                raise e  # bubble up
 
             except ValueError as e:
                 if e.args[0] == 'API response empty':
@@ -187,6 +188,10 @@ class Stock(db.Model):
 
                 self.save()
 
+            except error.HTTPError as e:
+                current_app.logger.error(f'AV API returned HTTP error {e.code} while querying for {self.ticker}')
+                raise e  # bubble up
+
             except ValueError as e:
                 if e.args[0] == 'API response empty':
                     current_app.logger.error(f'AV API provided empty response for {self.ticker}')
@@ -198,8 +203,8 @@ class Stock(db.Model):
                     current_app.logger.error(f'AV API returned error response for {self.ticker}')
                     raise e  # bubble up
 
-            except error.HTTPError as e:
-                current_app.logger.error(f'AV API returned HTTP error {e.code} while querying for {self.ticker}')
+            except SQLAlchemyError as e:
+                current_app.logger.error(f'SQLAlchemyError for {self.ticker} while saving data from API response')
                 raise e  # bubble up
 
         # todo add error handling if offline mode - currently this method exits silently
