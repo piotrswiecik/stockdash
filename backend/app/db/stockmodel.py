@@ -24,7 +24,7 @@ class Stock(db.Model):
     # API-derived fields
     id = db.Column(db.Integer, primary_key=True)
     timeseries = db.Column(db.JSON)  # full timeseries data as JSON
-    ticker = db.Column(db.String(10))
+    ticker = db.Column(db.String(10), unique=True)
     name = db.Column(db.String(100))
     description = db.Column(db.Text)
     exchange = db.Column(db.String(8))
@@ -88,7 +88,7 @@ class Stock(db.Model):
         """
         Queries AlphaVantage for price data via TIME_SERIES_DAILY API call.
         Needs access to API key stored in app config - available only in app context.
-        :return:
+        :return: todo proper return
         """
         key = current_app.config['ALPHA_VANTAGE_API_KEY']
         if key:  # otherwise - offline mode
@@ -117,7 +117,7 @@ class Stock(db.Model):
                 self.save()
 
             except error.HTTPError as e:
-                pass  # todo basic HTTP error handling
+                current_app.logger.error(f'AV API returned HTTP error {e.code} while querying for {self.ticker}')
 
             except ValueError as e:
                 if e.args[0] == 'API response empty':
@@ -127,9 +127,9 @@ class Stock(db.Model):
 
             except SQLAlchemyError as e:
                 current_app.logger.error(f'SQLAlchemyError for {self.ticker} while saving data from API response')
-                pass  # todo handle DB operational error
 
         # todo add error handling if offline mode - currently this method exits silently
 
-
+    def get_overview_data(self):
+        pass
 
