@@ -30,8 +30,8 @@ class Stock(db.Model):
     exchange = db.Column(db.String(8))
     sector = db.Column(db.String(30))
     industry = db.Column(db.String(30))
-    market_cap = db.Column(db.Integer)
-    no_shares = db.Column(db.Integer)
+    market_cap = db.Column(db.BIGINT)
+    no_shares = db.Column(db.BIGINT)
     trail_pe_ratio = db.Column(db.Float)
     fwd_pe_ratio = db.Column(db.Float)
     d_yield = db.Column(db.Float)
@@ -168,6 +168,23 @@ class Stock(db.Model):
                     raise ValueError('API response empty')  # todo verify with pytest monkeypatch
 
                 # parsing the response and populating fields
+
+                self.name = query_response_unpacked['Name']
+                self.description = query_response_unpacked['Description']
+                self.exchange = query_response_unpacked['Exchange']
+                self.sector = query_response_unpacked['Sector'].lower().title()
+                self.industry = query_response_unpacked['Industry'].lower().title()
+                self.market_cap = int(query_response_unpacked['MarketCapitalization'])
+                self.no_shares = int(query_response_unpacked['SharesOutstanding'])
+                self.trail_pe_ratio = float(query_response_unpacked['TrailingPE'])
+                self.fwd_pe_ratio = float(query_response_unpacked['ForwardPE'])
+                self.d_yield = float(query_response_unpacked['DividendYield'])
+                self.high_52w = float(query_response_unpacked['52WeekHigh'])
+                self.low_52w = float(query_response_unpacked['52WeekLow'])
+                self.eps = {'eps': 'eps'}  # todo eps
+                self.last_cache_time = datetime.datetime.now()
+
+                self.save()
 
             except ValueError as e:
                 if e.args[0] == 'API response empty':
