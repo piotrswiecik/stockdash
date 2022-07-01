@@ -11,6 +11,7 @@ from flask_cors import CORS
 from typing import Optional, Any, Mapping
 from app.db import db, migrate
 from app.db.usermodel import User
+from app.db.stockmodel import Stock
 from app.restapi import restapi as restapi_blueprint
 
 
@@ -34,7 +35,7 @@ def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
     # setup & activate custom logging
     log_handler = RotatingFileHandler(
         os.path.join('instance', 'logs', ''.join(['sd_', os.environ.get('FLASK_ENV', 'undefined'), '.log'])),
-        maxBytes=2**14,
+        maxBytes=2 ** 14,
         backupCount=5
     )
     log_formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(filename)s:%(lineno)d]')
@@ -69,15 +70,20 @@ def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
     # todo remember about production settings - this is temporary & unlocks all routes
     CORS(app)
 
+    # AlphaVantage settings
+    app.config['ALPHA_VANTAGE_API_KEY'] = os.environ.get('ALPHA_VANTAGE_API_KEY')  # Todo move to config file maybe??
+    app.config['ALPHA_VANTAGE_URL_BASE'] = os.environ.get('ALPHA_VANTAGE_URL_BASE',
+                                                          'https://www.alphavantage.co/query=?')
+
     # configure shell context
     @app.shell_context_processor
     def make_shell_context():
         return {
             'db': db,
-            'User': User
+            'User': User,
+            'Stock': Stock
         }
 
     app.logger.info(f'Application started with env: {os.environ.get("FLASK_ENV")}')
 
     return app
-
