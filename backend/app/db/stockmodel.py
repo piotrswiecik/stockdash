@@ -108,6 +108,9 @@ class Stock(db.Model):
                 if 'Note' in query_response_unpacked and overload_message in query_response_unpacked['Note']:
                     raise ValueError('API call limit exceeded')
 
+                if 'Error Message' in query_response_unpacked:
+                    raise ValueError('Generic API error', query_response_unpacked['Error Message'])
+
                 if not query_response_unpacked:
                     raise ValueError('API response empty')  # todo verify with pytest monkeypatch
 
@@ -124,6 +127,9 @@ class Stock(db.Model):
                     raise e  # bubble up
                 if e.args[0] == 'API call limit exceeded':
                     current_app.logger.info(f'AV API call limit exceeded')
+                    raise e  # bubble up
+                if e.args[0] == 'Generic API error':
+                    current_app.logger.error(f'AV API returned error response for {self.ticker}')
                     raise e  # bubble up
 
             except SQLAlchemyError as e:
@@ -155,6 +161,9 @@ class Stock(db.Model):
                 if 'Note' in query_response_unpacked and overload_message in query_response_unpacked['Note']:
                     raise ValueError('API call limit exceeded')
 
+                if 'Error Message' in query_response_unpacked:
+                    raise ValueError('Generic API error', query_response_unpacked['Error Message'])
+
                 if not query_response_unpacked:
                     raise ValueError('API response empty')  # todo verify with pytest monkeypatch
 
@@ -163,9 +172,13 @@ class Stock(db.Model):
             except ValueError as e:
                 if e.args[0] == 'API response empty':
                     current_app.logger.error(f'AV API provided empty response for {self.ticker}')
+                    raise e  # bubble up
                 if e.args[0] == 'API call limit exceeded':
                     current_app.logger.info(f'AV API call limit exceeded')
-
+                    raise e  # bubble up
+                if e.args[0] == 'Generic API error':
+                    current_app.logger.error(f'AV API returned error response for {self.ticker}')
+                    raise e  # bubble up
 
         # todo add error handling if offline mode - currently this method exits silently
 
