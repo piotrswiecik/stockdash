@@ -134,6 +134,7 @@ class Stock(db.Model):
 
             except SQLAlchemyError as e:
                 current_app.logger.error(f'SQLAlchemyError for {self.ticker} while saving data from API response')
+                raise e  # bubble up
 
         # todo add error handling if offline mode - currently this method exits silently
 
@@ -196,6 +197,10 @@ class Stock(db.Model):
                 if e.args[0] == 'Generic API error':
                     current_app.logger.error(f'AV API returned error response for {self.ticker}')
                     raise e  # bubble up
+
+            except error.HTTPError as e:
+                current_app.logger.error(f'AV API returned HTTP error {e.code} while querying for {self.ticker}')
+                raise e  # bubble up
 
         # todo add error handling if offline mode - currently this method exits silently
 
