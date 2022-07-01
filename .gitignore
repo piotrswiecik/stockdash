@@ -5,3 +5,4 @@ devlog.md
 backend/utility.sh
 **/instance
 **/.pytest_cache
+apitest.py
