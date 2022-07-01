@@ -103,15 +103,15 @@ class Stock(db.Model):
                                    "if you would like to target a higher API call frequency. "
 
                 query_response = request.urlopen(query_string)
-                query_response_unpacked = json.loads(query_response.read().decode('utf-8'))
+                # query_response_unpacked = json.loads(query_response.read().decode('utf-8'))
+                query_response_unpacked = query_response.json()
 
                 if 'Note' in query_response_unpacked and overload_message in query_response_unpacked['Note']:
                     raise ValueError('API call limit exceeded')
 
-                if self.timeseries == '':
-                    raise ValueError('API response empty')
+                if not query_response_unpacked:
+                    raise ValueError('API response empty')  # todo verify with pytest monkeypatch
 
-                print(query_response_unpacked)
                 self.timeseries = query_response_unpacked
 
                 self.save()
@@ -131,5 +131,43 @@ class Stock(db.Model):
         # todo add error handling if offline mode - currently this method exits silently
 
     def get_overview_data(self):
-        pass
+        """
+        Queries AlphaVantage for company data via OVERVIEW API call.
+        Needs access to API key stored in app config - available only in app context.
+        :return:
+        """
+        key = current_app.config['ALPHA_VANTAGE_API_KEY']
+        if key:
+            query_string = current_app.config['ALPHA_VANTAGE_URL_BASE'] + 'function=OVERVIEW'
+            query_string += '&symbol=' + self.ticker
+            query_string += '&apikey=' + key
+
+            try:
+                # todo remove hardcoded message to config
+                overload_message = "Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls per " \
+                                   "minute and 500 calls per day. Please visit https://www.alphavantage.co/premium/ " \
+                                   "if you would like to target a higher API call frequency. "
+
+                query_response = request.urlopen(query_string)
+                # query_response_unpacked = json.loads(query_response.read().decode('utf-8'))
+                query_response_unpacked = query_response.json()
+
+                if 'Note' in query_response_unpacked and overload_message in query_response_unpacked['Note']:
+                    raise ValueError('API call limit exceeded')
+
+                if not query_response_unpacked:
+                    raise ValueError('API response empty')  # todo verify with pytest monkeypatch
+
+                # parsing the response and populating fields
+
+            except ValueError as e:
+                if e.args[0] == 'API response empty':
+                    current_app.logger.error(f'AV API provided empty response for {self.ticker}')
+                if e.args[0] == 'API call limit exceeded':
+                    current_app.logger.info(f'AV API call limit exceeded')
+
+
+        # todo add error handling if offline mode - currently this method exits silently
+
+
 
