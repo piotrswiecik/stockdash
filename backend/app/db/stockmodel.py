@@ -77,7 +77,25 @@ class Stock(db.Model):
         db.session.commit()
 
     def json(self) -> dict:
-        return {'test': 'test'}
+        return {
+            'id': self.id,
+            'ticker': self.ticker,
+            'name': self.name,
+            'description': self.description,
+            'exchange': self.exchange,
+            'sector': self.sector,
+            'industry': self.industry,
+            'market_cap': self.market_cap,
+            'no_shares': self.no_shares,
+            'trail_pe_ratio': self.trail_pe_ratio,
+            'fwd_pe_ratio': self.fwd_pe_ratio,
+            'd_yield': self.d_yield,
+            'high_52w': self.high_52w,
+            'low_52w': self.low_52w,
+            'eps': '',  # placeholder
+            'last_cache_time': self.last_cache_time.strftime('%Y-%m-%d:%H-%M-%S'),
+            'timeseries': self.timeseries
+        }
 
     def check_if_cached(self, date: datetime.datetime) -> bool:
         """
