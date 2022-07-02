@@ -97,13 +97,15 @@ class Stock(db.Model):
             'timeseries': self.timeseries
         }
 
-    def check_if_cached(self, date: datetime.datetime) -> bool:
+    def is_cached(self) -> bool:
         """
-        Checks last cache time against given date and returns False if date is more recent than last cache.
-        :param date: Date in datetime.date format.
-        :return: False if data is not fully cached.)
+        Verifies if data in DB cache is fresh.
+        True if last_cache_time is at most yesterday 21:15 UTC (US exchange closing time + 15).
+        :return: False if data is not cached.
         """
-        return (self.last_cache_time - date).days > 0
+        prev_day = (datetime.datetime.utcnow() - datetime.timedelta(days=1)).date()
+        closing_datetime = datetime.datetime(prev_day.year, prev_day.month, prev_day.day, hour=21, minute=15, second=0)
+        return self.last_cache_time > closing_datetime
 
     def get_timeseries_data(self):
         """
@@ -136,6 +138,7 @@ class Stock(db.Model):
                     raise ValueError('API response empty')  # todo verify with pytest monkeypatch
 
                 self.timeseries = query_response_unpacked
+                self.last_cache_time = datetime.datetime.now(datetime.timezone.utc)
 
                 self.save()
 
@@ -201,13 +204,6 @@ class Stock(db.Model):
                 self.high_52w = float(query_response_unpacked['52WeekHigh'])
                 self.low_52w = float(query_response_unpacked['52WeekLow'])
                 self.eps = {'eps': 'eps'}  # todo eps
-                self.last_cache_time = datetime.datetime.now()
-
-                print('Object ready to save to DB')
-                print(self.name)
-                print(self.exchange)
-                print(self.industry)
-                print(self.d_yield)
 
                 self.save()
 
