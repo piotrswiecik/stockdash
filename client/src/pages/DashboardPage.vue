@@ -27,7 +27,22 @@ import DashNavi from "@/components/layout/DashNavi";
 
 export default {
   name: "Dashboard",
+  data() {
+    return {
+      currentStock: 'XOM', // todo de-hardcode
+    }
+  },
   components: { DashFooter, DashContent, DashHeader, DashNavi },
+  // lifecycle hook auto-triggers data request
+  // for now - default company is XOM
+  // todo later on - introduce favorites / default starting stock - or maybe save last viewed?
+  beforeMount() {
+    // loading the first stock in session
+    this.$store.dispatch('stock/getApiData');
+  },
+  beforeUpdate() {
+    // when another stock is selected
+  },
 }
 </script>
 

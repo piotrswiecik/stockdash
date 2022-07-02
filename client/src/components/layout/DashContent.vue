@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <div>Ticker: {{ currentTicker }} Name: {{ currentName }} </div>
+  </div>
+  <div class="container">
     <div class="dash-content-left-bar">
       <p>STATS</p>
       <p>STATS</p>
@@ -24,7 +27,7 @@
 
       </div>
       <div class="item-description">
-        <p>des</p>
+        <dash-description></dash-description>
       </div>
     </div>
 
@@ -32,8 +35,19 @@
 </template>
 
 <script>
+import DashDescription from "@/components/layout/DashDescription";
+
 export default {
-  name: "DashContent"
+  name: "DashContent",
+  components: {DashDescription},
+  computed: {
+    currentTicker() {
+      return this.$store.getters['stock/currentTicker'];
+    },
+    currentName() {
+      return this.$store.getters['stock/currentName'];
+    },
+  }
 }
 </script>
 
