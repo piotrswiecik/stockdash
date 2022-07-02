@@ -18,6 +18,9 @@ def log_restapi_request() -> None:
 
 
 # importing resources
-from . import user_res
+from app.restapi.user_res import UserLogin
+from app.restapi.stock_res import StockResource
 
-api.add_resource(user_res.UserLogin, '/login')
+api.add_resource(UserLogin, '/login')
+api.add_resource(StockResource, '/stock/<string:ticker>')
+

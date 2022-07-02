@@ -4,6 +4,7 @@ Mainly proper handling of various responses and errors.
 """
 import datetime
 import random
+import json
 
 import pytest
 
@@ -26,12 +27,12 @@ class MockSuccessTimeSeriesResponse(object):
         self.headers = {'Content-Type': 'application/json'}
 
     @classmethod
-    def json(cls) -> dict:
+    def read(cls) -> str:
         """
         Generate mock response content as specified in TIME_SERIES_DAILY API.
         :return: Dictionary containing deserialized response data.
         """
-        return timeseries_response
+        return json.dumps(timeseries_response)
 
 
 class MockSuccessOverviewResponse(object):
@@ -44,12 +45,12 @@ class MockSuccessOverviewResponse(object):
         self.headers = {'Content-Type': 'application/json'}
 
     @classmethod
-    def json(cls) -> dict:
+    def read(cls) -> str:
         """
         Generate mock response content as specified in OVERVIEW API.
         :return: Dictionary containing deserialized response data.
         """
-        return overview_response
+        return json.dumps(overview_response)
 
 
 class MockLimitExceededResponse(object):
@@ -63,16 +64,16 @@ class MockLimitExceededResponse(object):
         self.headers = {'Content-Type': 'application/json'}
 
     @classmethod
-    def json(cls) -> dict:
+    def read(cls) -> str:
         """
         Generate mock response content containing error message.
         :return: Dictionary containing deserialized response data.
         """
-        return {
+        return json.dumps({
             "Note": "Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls per minute and 500 "
                     "calls per day. Please visit https://www.alphavantage.co/premium/ if you would like to target a "
                     "higher API call frequency. "
-        }
+        })
 
 
 class MockEmptyResponse(object):
@@ -86,12 +87,12 @@ class MockEmptyResponse(object):
         self.headers = {'Content-Type': 'application/json'}
 
     @classmethod
-    def json(cls) -> dict:
+    def read(cls) -> str:
         """
         Generate mock response content containing empty body.
         :return: Dictionary containing deserialized response data.
         """
-        return {}
+        return json.dumps({})
 
 
 class MockErrorResponse(object):
@@ -105,16 +106,16 @@ class MockErrorResponse(object):
         self.headers = {'Content-Type': 'application/json'}
 
     @classmethod
-    def json(cls) -> dict:
+    def read(cls) -> str:
         """
         Generate mock response content containing error message body.
         :return: Dictionary containing deserialized response data.
         """
-        return {
+        return json.dumps({
             "Error Message": "Invalid API call. Please retry or visit the documentation "
                              "(https://www.alphavantage.co/documentation/)"
                              " for TIME_SERIES_DAILY."
-        }
+        })
 
 
 def test_monkeypatch_get_time_series_daily_success(monkeypatch, app, client):

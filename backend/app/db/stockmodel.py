@@ -76,6 +76,9 @@ class Stock(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def json(self) -> dict:
+        return {'test': 'test'}
+
     def check_if_cached(self, date: datetime.datetime) -> bool:
         """
         Checks last cache time against given date and returns False if date is more recent than last cache.
@@ -103,7 +106,7 @@ class Stock(db.Model):
                                    "if you would like to target a higher API call frequency. "
 
                 query_response = request.urlopen(query_string)
-                query_response_unpacked = query_response.json()
+                query_response_unpacked = json.loads(query_response.read())
 
                 if 'Note' in query_response_unpacked and overload_message in query_response_unpacked['Note']:
                     raise ValueError('API call limit exceeded')
@@ -154,7 +157,7 @@ class Stock(db.Model):
                                    "if you would like to target a higher API call frequency. "
 
                 query_response = request.urlopen(query_string)
-                query_response_unpacked = query_response.json()
+                query_response_unpacked = json.loads(query_response.read())
 
                 if 'Note' in query_response_unpacked and overload_message in query_response_unpacked['Note']:
                     raise ValueError('API call limit exceeded')
@@ -172,8 +175,8 @@ class Stock(db.Model):
                 self.exchange = query_response_unpacked['Exchange']
                 self.sector = query_response_unpacked['Sector'].lower().title()
                 self.industry = query_response_unpacked['Industry'].lower().title()
-                self.market_cap = int(query_response_unpacked['MarketCapitalization'])
-                self.no_shares = int(query_response_unpacked['SharesOutstanding'])
+                self.market_cap = query_response_unpacked['MarketCapitalization']
+                self.no_shares = query_response_unpacked['SharesOutstanding']
                 self.trail_pe_ratio = float(query_response_unpacked['TrailingPE'])
                 self.fwd_pe_ratio = float(query_response_unpacked['ForwardPE'])
                 self.d_yield = float(query_response_unpacked['DividendYield'])
@@ -181,6 +184,12 @@ class Stock(db.Model):
                 self.low_52w = float(query_response_unpacked['52WeekLow'])
                 self.eps = {'eps': 'eps'}  # todo eps
                 self.last_cache_time = datetime.datetime.now()
+
+                print('Object ready to save to DB')
+                print(self.name)
+                print(self.exchange)
+                print(self.industry)
+                print(self.d_yield)
 
                 self.save()
 
