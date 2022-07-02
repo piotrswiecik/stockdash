@@ -9,7 +9,7 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from typing import Optional, Any, Mapping
-from app.db import db, migrate
+from app.db import db
 from app.db.usermodel import User
 from app.db.stockmodel import Stock
 from app.restapi import restapi as restapi_blueprint
@@ -58,7 +58,6 @@ def create_app(custom_config: Optional[Mapping[str, Any]] = None) -> Flask:
 
     # database-related init
     db.init_app(app)
-    migrate.init_app(app, db)
 
     # security init
     jwt = JWTManager(app)

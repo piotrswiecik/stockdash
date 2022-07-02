@@ -166,7 +166,7 @@ class Stock(db.Model):
                     raise ValueError('Generic API error', query_response_unpacked['Error Message'])
 
                 if not query_response_unpacked:
-                    raise ValueError('API response empty')  # todo verify with pytest monkeypatch
+                    raise ValueError('API response empty')
 
                 # parsing the response and populating fields
 
