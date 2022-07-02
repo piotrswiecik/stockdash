@@ -3,11 +3,15 @@ Tests for AlphaVantage interface.
 Mainly proper handling of various responses and errors.
 """
 import datetime
+import random
 
 import pytest
 
 from app.db.stockmodel import Stock
 from urllib import request
+from urllib.error import HTTPError
+
+from flask import abort
 
 from tests.mock_responses import overview_response, timeseries_response
 
@@ -90,7 +94,7 @@ class MockEmptyResponse(object):
         return {}
 
 
-class MockErrorResponseObject(object):
+class MockErrorResponse(object):
     """
     Represents an error response to AlphaVantage TIME_SERIES_DAILY request.
     In this case, status is 200 but response JSON contains error message.
@@ -176,8 +180,8 @@ def test_monkeypatch_get_time_series_daily_api_generic_error(monkeypatch, app):
     When API returns status 200 but with error message (generic error e.g. due to invalid ticker).
     Then app raises ValueError to be handled by caller.
     """
-    def mock_http_urlopen(url: str) -> MockErrorResponseObject:
-        return MockErrorResponseObject(url)
+    def mock_http_urlopen(url: str) -> MockErrorResponse:
+        return MockErrorResponse(url)
 
     monkeypatch.setattr(request, 'urlopen', mock_http_urlopen)
 
@@ -185,14 +189,6 @@ def test_monkeypatch_get_time_series_daily_api_generic_error(monkeypatch, app):
         with app.app_context():
             stock = Stock('IBM')
             stock.get_timeseries_data()
-
-
-def test_monkeypatch_get_time_series_daily_api_incorrect_key(monkeypatch, app):
-    pass
-
-
-def test_monkeypatch_get_time_series_daily_api_httperror(monkeypatch, app):
-    pass
 
 
 def test_monkeypatch_get_overview_success(monkeypatch, app):
@@ -229,3 +225,53 @@ def test_monkeypatch_get_overview_success(monkeypatch, app):
     assert db_response.eps == {'eps': 'eps'}
     assert datetime.datetime.now() - db_response.last_cache_time < datetime.timedelta(seconds=5)
 
+
+def test_monkeypatch_get_overview_api_overloaded(monkeypatch, app):
+    """
+    Given a monkeypatched version of urllib.request.urlopen()
+    When HTTP response is received as OK (200) but API limit is exceeded.
+    Then response content contains error message & app raises ValueError to be handled by caller.
+    """
+    def mock_http_urlopen(url: str) -> MockLimitExceededResponse:
+        return MockLimitExceededResponse(url)
+
+    monkeypatch.setattr(request, 'urlopen', mock_http_urlopen)
+
+    with pytest.raises(ValueError) as value_error:
+        with app.app_context():
+            stock = Stock('IBM')
+            stock.get_overview_data()
+
+
+def test_monkeypatch_get_overview_api_empty_response(monkeypatch, app):
+    """
+    Given a monkeypatched version of urllib.request.urlopen()
+    When HTTP response is received as OK (200) but message body is empty.
+    Then app raises ValueError to be handled by caller.
+    """
+    def mock_http_urlopen(url: str) -> MockEmptyResponse:
+        return MockEmptyResponse(url)
+
+    monkeypatch.setattr(request, 'urlopen', mock_http_urlopen)
+
+    with pytest.raises(ValueError) as value_error:
+        with app.app_context():
+            stock = Stock('IBM')
+            stock.get_overview_data()
+
+
+def test_monkeypatch_get_overview_api_generic_error(monkeypatch, app):
+    """
+    Given a monkeypatched version of urllib.request.urlopen()
+    When API returns status 200 but with error message (generic error e.g. due to invalid ticker).
+    Then app raises ValueError to be handled by caller.
+    """
+    def mock_http_urlopen(url: str) -> MockErrorResponse:
+        return MockErrorResponse(url)
+
+    monkeypatch.setattr(request, 'urlopen', mock_http_urlopen)
+
+    with pytest.raises(ValueError) as value_error:
+        with app.app_context():
+            stock = Stock('IBM')
+            stock.get_overview_data()

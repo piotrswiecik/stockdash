@@ -118,10 +118,6 @@ class Stock(db.Model):
 
                 self.save()
 
-            except error.HTTPError as e:
-                current_app.logger.error(f'AV API returned HTTP error {e.code} while querying for {self.ticker}')
-                raise e  # bubble up
-
             except ValueError as e:
                 if e.args[0] == 'API response empty':
                     current_app.logger.error(f'AV API provided empty response for {self.ticker}')
@@ -187,10 +183,6 @@ class Stock(db.Model):
                 self.last_cache_time = datetime.datetime.now()
 
                 self.save()
-
-            except error.HTTPError as e:
-                current_app.logger.error(f'AV API returned HTTP error {e.code} while querying for {self.ticker}')
-                raise e  # bubble up
 
             except ValueError as e:
                 if e.args[0] == 'API response empty':
