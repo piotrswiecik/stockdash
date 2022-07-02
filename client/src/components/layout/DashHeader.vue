@@ -1,11 +1,7 @@
 <template>
-  <div class="container">
-    <div class="item-left">
-      <h2>StockDash</h2>
-    </div>
-    <div class="item-right">
-      <p><a href="#" @click="logout">Logout</a></p>
-    </div>
+  <div class="flex-grid flex-header">
+    <div class="col-wide"><h2>StockDash</h2></div>
+    <div class="col"><a href="#" @click="logout">Logout</a></div>
   </div>
 </template>
 
@@ -21,17 +17,19 @@ export default {
 </script>
 
 <style scoped>
-.container {
+.flex-grid {
   display: flex;
-  justify-content: flex-start;
-  width: 500px;
+  border: 1px solid white;
 }
-
-.item-left {
-  flex-grow: 4;
+.flex-header {
+  align-items: center;
+  border: 1px solid white;
 }
-
-.item-right {
-  flex-grow: 1;
+.col {
+  flex: 1;
+}
+.col-wide {
+  width: 80%!important;
+  border: 1px solid white;
 }
 </style>

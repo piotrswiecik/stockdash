@@ -1,19 +1,17 @@
 <template>
-  <div class="container">
-    <div class="dash-page-header">
-      <dash-header></dash-header>
-    </div>
+  <div class="flex-grid">
+    <div class="col"><dash-header></dash-header></div>
   </div>
-  <div class="container">
-    <div class="dash-page-navi">
+  <div class="flex-grid">
+    <div class="col-navi">
       <dash-navi></dash-navi>
     </div>
-    <div class="dash-page-content">
+    <div class="col">
       <dash-content></dash-content>
     </div>
   </div>
-  <div class="container">
-    <div class="dash-page-footer">
+  <div class="flex-grid">
+    <div class="col">
       <dash-footer></dash-footer>
     </div>
   </div>
@@ -32,6 +30,8 @@ export default {
       currentStock: 'XOM', // todo de-hardcode
     }
   },
+
+  // eslint-disable-next-line vue/no-unused-components
   components: { DashFooter, DashContent, DashHeader, DashNavi },
   // lifecycle hook auto-triggers data request
   // for now - default company is XOM
@@ -47,28 +47,17 @@ export default {
 </script>
 
 <style scoped>
-.container {
+.flex-grid {
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: space-evenly;
-  align-items: flex-start;
-  gap: 20px;
-  border: 1px solid black;
+  border: 1px solid white;
+}
+.col {
+  flex: 1;
+  border: 1px solid white;
 }
 
-.dash-page-header {
-  align-self: flex-start;
-}
-
-.dash-page-navi {
-  align-self: flex-start;
-  flex-grow: 1;
-}
-
-.dash-page-content {
-  align-self: center;
-  flex-grow: 3;
+.col-navi {
+  width: 20%!important;
 }
 
 </style>

@@ -1,36 +1,32 @@
 <template>
-  <div class="container">
-    <div>Ticker: {{ currentTicker }} Name: {{ currentName }} </div>
+  <div class="flex-grid">
+    <div class="col">
+      ticker+exch
+    </div>
+    <div class="col">
+      name
+    </div>
   </div>
-  <div class="container">
-    <div class="dash-content-left-bar">
+  <div class="flex-grid">
+    <div class="col-stats">
       <p>STATS</p>
       <p>STATS</p>
       <p>STATS</p>
       <p>STATS</p>
       <p>STATS</p>
-
+      <p>STATS</p>
+      <p>STATS</p>
+      <p>STATS</p>
+      <p>STATS</p>
+      <p>STATS</p>
+      <p>STATS</p>
     </div>
-    <div class="dash-content-right-field">
-      <div class="item-chart">
-        <p>chart</p>
-        <p>chart</p>
-        <p>chart</p>
-        <p>chart</p>
-        <p>chart</p>
-        <p>chart</p>
-        <p>chart</p>
-        <p>chart</p>
-        <p>chart</p>
-        <p>chart</p>
-
-
-      </div>
-      <div class="item-description">
-        <dash-description></dash-description>
-      </div>
+    <div class="col">chart</div>
+  </div>
+  <div class="flex-grid">
+    <div class="col">
+      <dash-description></dash-description>
     </div>
-
   </div>
 </template>
 
@@ -39,6 +35,7 @@ import DashDescription from "@/components/layout/DashDescription";
 
 export default {
   name: "DashContent",
+  // eslint-disable-next-line vue/no-unused-components
   components: {DashDescription},
   computed: {
     currentTicker() {
@@ -52,30 +49,17 @@ export default {
 </script>
 
 <style scoped>
-.container {
+.flex-grid {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  border: 1px solid white;
+}
+.col {
+  border: 1px solid white;
+  flex: 1;
 }
 
-.dash-content-right-field {
-  display: flex;
-  flex-wrap: nowrap;
-  flex-direction: column;
-  flex-grow: 4;
-}
-
-.dash-content-left-bar {
-  height: 100%;
-  flex-grow: 1;
-}
-
-.item-chart {
-  flex-grow: 6;
-}
-
-.item-description {
-  flex-grow: 2;
+.col-stats {
+  width: 25%;
 }
 
 </style>
