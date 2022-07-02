@@ -1,16 +1,16 @@
 <template>
   <div class="flex-grid">
     <div class="col">
-      ticker+exch
+      {{ currentExchange }}:{{ currentTicker }}
     </div>
     <div class="col">
-      name
+      {{ currentName }}
     </div>
   </div>
   <div class="flex-grid">
     <div class="col-stats">
-      <p>STATS</p>
-      <p>STATS</p>
+      <p>{{ currentSector }}</p>
+      <p>{{ currentIndustry }}</p>
       <p>STATS</p>
       <p>STATS</p>
       <p>STATS</p>
@@ -44,6 +44,15 @@ export default {
     currentName() {
       return this.$store.getters['stock/currentName'];
     },
+    currentExchange() {
+      return this.$store.getters['stock/currentExchange'];
+    },
+    currentSector() {
+      return this.$store.getters['stock/currentSector'];
+    },
+    currentIndustry() {
+      return this.$store.getters['stock/currentIndustry'];
+    }
   }
 }
 </script>
